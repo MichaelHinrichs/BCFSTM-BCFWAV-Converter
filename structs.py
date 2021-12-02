@@ -25,7 +25,7 @@ import struct
 
 class Header(struct.Struct):
     def __init__(self, bom):
-        super().__init__(bom + '4s2xH2I2H')
+        super().__init__(f'{bom}4s2xH2I2H')
 
     def data(self, data, pos):
         (self.magic,
@@ -38,7 +38,7 @@ class Header(struct.Struct):
 
 class BLKHeader(struct.Struct):
     def __init__(self, bom):
-        super().__init__(bom + '4sI')
+        super().__init__(f'{bom}4sI')
 
     def data(self, data, pos):
         (self.magic,
@@ -47,7 +47,7 @@ class BLKHeader(struct.Struct):
 
 class STMInfo(struct.Struct):  # Stream Info
     def __init__(self, bom):
-        super().__init__(bom + '3B1x11I')
+        super().__init__(f'{bom}3B1x11I')
 
     def data(self, data, pos):
         (self.codec,
@@ -68,7 +68,7 @@ class STMInfo(struct.Struct):  # Stream Info
 
 class WAVInfo(struct.Struct):  # Stream Info
     def __init__(self, bom):
-        super().__init__(bom + '2B2x4I')
+        super().__init__(f'{bom}2B2x4I')
 
     def data(self, data, pos):
         (self.codec,
@@ -81,7 +81,7 @@ class WAVInfo(struct.Struct):  # Stream Info
 
 class TRKInfo(struct.Struct):  # Track Info
     def __init__(self, bom):
-        super().__init__(bom + '2BH')
+        super().__init__(f'{bom}2BH')
 
     def data(self, data, pos):
         (self.volume,
@@ -91,7 +91,7 @@ class TRKInfo(struct.Struct):  # Track Info
 
 class DSPContext(struct.Struct):
     def __init__(self, bom):
-        super().__init__(bom + '3H')
+        super().__init__(f'{bom}3H')
 
     def data(self, data, pos):
         (self.predictor_scale,
@@ -101,7 +101,7 @@ class DSPContext(struct.Struct):
 
 class IMAContext(struct.Struct):
     def __init__(self, bom):
-        super().__init__(bom + '2H')
+        super().__init__(f'{bom}2H')
 
     def data(self, data, pos):
         (self.data_,
@@ -110,7 +110,7 @@ class IMAContext(struct.Struct):
 
 class Ref(struct.Struct):  # Reference
     def __init__(self, bom):
-        super().__init__(bom + 'H2xi')
+        super().__init__(f'{bom}H2xi')
 
     def data(self, data, pos):
         (self.type_,

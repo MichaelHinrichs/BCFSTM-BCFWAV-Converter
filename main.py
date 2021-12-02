@@ -117,7 +117,7 @@ def STMtoSTM(f, magic, dest, dest_bom):
             outputBuffer[pos + 12 * (i - 1):pos + 12 * (i - 1) + sized_refs[i].size] = bytes(
                 Ref(dest_bom).pack(sized_refs[i].type_, sized_refs[i].offset))
 
-        sized_refs[i].block_size = struct.unpack(bom + "I", f[pos + 12 * (i - 1) + 8:pos + 12 * i])[0]
+        sized_refs[i].block_size = struct.unpack(f"{bom}I", f[pos + 12 * (i - 1) + 8:pos + 12 * i])[0]
         outputBuffer[pos + 12 * (i - 1) + 8:pos + 12 * i] = to_bytes(sized_refs[i].block_size, 4, dest_bom)
 
     if sized_refs[1].type_ != 0x4000 or sized_refs[1].offset in [0, -1]:
@@ -197,7 +197,7 @@ def STMtoSTM(f, magic, dest, dest_bom):
 
     if trkInfoTable_ref.offset not in [0, -1]:
         pos = trkInfoTable_ref.offset + stmInfo_ref.pos
-        count = struct.unpack(bom + "I", f[pos:pos + 4])[0]
+        count = struct.unpack(f"{bom}I", f[pos:pos + 4])[0]
         outputBuffer[pos:pos + 4] = to_bytes(count, 4, dest_bom)
         pos += 4
 
@@ -226,7 +226,7 @@ def STMtoSTM(f, magic, dest, dest_bom):
 
                 if channelIndexByteTable_ref.offset not in [0, -1]:
                     pos = channelIndexByteTable_ref.offset + pos - trkInfo[i].size
-                    count = struct.unpack(bom + "I", f[pos:pos + 4])[0]
+                    count = struct.unpack(f"{bom}I", f[pos:pos + 4])[0]
                     outputBuffer[pos:pos + 4] = to_bytes(count, 4, dest_bom)
                     pos += 4
                     elem = f[pos:pos + count]
@@ -237,7 +237,7 @@ def STMtoSTM(f, magic, dest, dest_bom):
     param = {}
 
     pos = channelInfoTable_ref.offset + stmInfo_ref.pos
-    count = struct.unpack(bom + "I", f[pos:pos + 4])[0]
+    count = struct.unpack(f"{bom}I", f[pos:pos + 4])[0]
     outputBuffer[pos:pos + 4] = to_bytes(count, 4, dest_bom)
     pos += 4
 
@@ -261,7 +261,7 @@ def STMtoSTM(f, magic, dest, dest_bom):
                 pos = ADPCMInfo_ref[i].offset + pos
                 if ADPCMInfo_ref[i].type_ == 0x0300:
                     for i in range(1, 17):
-                        param[i] = struct.unpack(bom + "H", f[pos + 2 * (i - 1):pos + 2 * (i - 1) + 2])[0]
+                        param[i] = struct.unpack(f"{bom}H", f[pos + 2 * (i - 1):pos + 2 * (i - 1) + 2])[0]
                         outputBuffer[pos + 2 * (i - 1):pos + 2 * (i - 1) + 2] = to_bytes(param[i], 2, dest_bom)
 
                     pos += 32
@@ -385,7 +385,7 @@ def WAVtoWAV(f, magic, dest, dest_bom):
         outputBuffer[pos + 12 * (i - 1):pos + 12 * (i - 1) + sized_refs[i].size] = bytes(
             Ref(dest_bom).pack(sized_refs[i].type_, sized_refs[i].offset))
 
-        sized_refs[i].block_size = struct.unpack(bom + "I", f[pos + 12 * (i - 1) + 8:pos + 12 * i])[0]
+        sized_refs[i].block_size = struct.unpack(f"{bom}I", f[pos + 12 * (i - 1) + 8:pos + 12 * i])[0]
 
         outputBuffer[pos + 12 * (i - 1) + 8:pos + 12 * i] = to_bytes(sized_refs[i].block_size, 4, dest_bom)
 
@@ -419,7 +419,7 @@ def WAVtoWAV(f, magic, dest, dest_bom):
     ADPCMInfo_ref = {}
     param = {}
 
-    count = struct.unpack(bom + "I", f[pos:pos + 4])[0]
+    count = struct.unpack(f"{bom}I", f[pos:pos + 4])[0]
     outputBuffer[pos:pos + 4] = to_bytes(count, 4, dest_bom)
     countPos = pos
 
@@ -451,7 +451,7 @@ def WAVtoWAV(f, magic, dest, dest_bom):
                 if ADPCMInfo_ref[i].type_ == 0x0300:
                     for i in range(16):
                         i += 1
-                        param[i] = struct.unpack(bom + "H", f[pos + 2 * (i - 1):pos + 2 * (i - 1) + 2])[0]
+                        param[i] = struct.unpack(f"{bom}H", f[pos + 2 * (i - 1):pos + 2 * (i - 1) + 2])[0]
                         outputBuffer[pos + 2 * (i - 1):pos + 2 * (i - 1) + 2] = to_bytes(param[i], 2, dest_bom)
 
                     pos += 32
@@ -603,7 +603,7 @@ def STMtoWAV(f, magic, dest, dest_bom):
     countPos = pos
     otherCountPos = otherPos
 
-    count = struct.unpack(bom + "I", f[pos:pos + 4])[0]
+    count = struct.unpack(f"{bom}I", f[pos:pos + 4])[0]
     outputBuffer[otherPos:otherPos + 4] = to_bytes(count, 4, dest_bom)
 
     otherFstChInfPos = otherCountPos + 4 + count * 8
@@ -650,7 +650,7 @@ def STMtoWAV(f, magic, dest, dest_bom):
 
                     for i in range(16):
                         i += 1
-                        param[i] = struct.unpack(bom + "H", f[pos + 2 * (i - 1):pos + 2 * (i - 1) + 2])[0]
+                        param[i] = struct.unpack(f"{bom}H", f[pos + 2 * (i - 1):pos + 2 * (i - 1) + 2])[0]
                         outputBuffer[otherPos + 2 * (i - 1):otherPos + 2 * (i - 1) + 2] = to_bytes(param[i], 2, dest_bom)
 
                     pos += 32; otherPos += 32
@@ -719,7 +719,7 @@ def STMtoWAV(f, magic, dest, dest_bom):
         elif sized_refs[i].type_ == 0x4000:
             numBlocks += 1
             outputBuffer[pos:pos + 8] = bytes(Ref(dest_bom).pack(0x7000, 0x40))
-            outputBuffer[pos + 8:pos + 12] = struct.pack(dest_bom + "I", infoBlkSize)
+            outputBuffer[pos + 8:pos + 12] = struct.pack(f"{dest_bom}I", infoBlkSize)
             outputBuffer[0x40:0x48] = bytes(BLKHeader(dest_bom).pack(b'INFO', infoBlkSize))
 
         else:
@@ -760,7 +760,7 @@ def STMtoWAV(f, magic, dest, dest_bom):
             outputBuffer[pos + 12:pos + 20] = bytes(Ref(dest_bom).pack(0x7001, dataBlkOffset))
             outputBuffer[dataBlkOffset + 0x20:] = data
             outputBuffer[dataBlkOffset:dataBlkOffset + 8] = bytes(BLKHeader(dest_bom).pack(b'DATA', len(outputBuffer) - dataBlkOffset))
-            outputBuffer[pos + 20:pos + 24] = struct.pack(dest_bom + "I", len(outputBuffer) - dataBlkOffset)
+            outputBuffer[pos + 20:pos + 24] = struct.pack(f"{dest_bom}I", len(outputBuffer) - dataBlkOffset)
 
     dest_ver = {"FWAV": 0x10100, "CWAV": 0x2010000}
 

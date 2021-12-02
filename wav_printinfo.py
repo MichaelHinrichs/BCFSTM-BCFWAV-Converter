@@ -52,11 +52,11 @@ def readFile(f):
         time.sleep(5)
         sys.exit(1)
     
-    print("\nMagic: " + bytes_to_string(header.magic))
-    print("Header size: " + hex(header.size_))
-    print("File version: " + hex(header.version))
-    print("File size: " + hex(header.fileSize))
-    print("Number of blocks: " + str(header.numBlocks))
+    print(f"\nMagic: {bytes_to_string(header.magic)}")
+    print(f"Header size: {hex(header.size_)}")
+    print(f"File version: {hex(header.version)}")
+    print(f"File size: {hex(header.fileSize)}")
+    print(f"Number of blocks: {str(header.numBlocks)}")
 
     pos += header.size
     sized_refs = {}
@@ -64,19 +64,19 @@ def readFile(f):
     for i in range(1, header.numBlocks + 1):
         sized_refs[i] = Ref(bom)
         sized_refs[i].data(f, pos + 12 * (i - 1))
-        sized_refs[i].block_size = struct.unpack(bom + "I", f[pos + 12 * (i - 1) + 8:pos + 12 * i])[0]
+        sized_refs[i].block_size = struct.unpack(f"{bom}I", f[pos + 12 * (i - 1) + 8:pos + 12 * i])[0]
 
         if sized_refs[i].offset not in [0, -1]:
             if sized_refs[i].type_ == 0x7000:
-                print("\nInfo Block offset: " + hex(sized_refs[i].offset))
+                print(f"\nInfo Block offset: {hex(sized_refs[i].offset)}")
 
             elif sized_refs[i].type_ == 0x7001:
-                print("\nData Block offset: " + hex(sized_refs[i].offset))
+                print(f"\nData Block offset: {hex(sized_refs[i].offset)}")
 
             else:
-                print("\n" + hex(sized_refs[i].type_) + " Block offset: " + hex(sized_refs[i].offset))
+                print(f"\n{hex(sized_refs[i].type_)} Block offset: {hex(sized_refs[i].offset)}")
 
-            print("Size: " + hex(sized_refs[i].block_size))
+            print(f"Size: {hex(sized_refs[i].block_size)}")
 
     if sized_refs[1].type_ != 0x7000 or sized_refs[1].offset in [0, -1]:
         print("\nSomething went wrong!\nError code: 5")
@@ -90,8 +90,8 @@ def readFile(f):
     info.data(f, pos)
     info.pos = pos
 
-    print("\nInfo Block Magic: " + bytes_to_string(info.magic))
-    print("Size: " + hex(info.size_))
+    print(f"\nInfo Block Magic: {bytes_to_string(info.magic)}")
+    print(f"Size: {hex(info.size_)}")
 
     pos += info.size
 
@@ -100,23 +100,23 @@ def readFile(f):
 
     codec = {0: "PCM8", 1: "PCM16", 2: "DSP ADPCM", 3: "IMA ADPCM"}
     if wavInfo.codec in codec:
-        print("\nEncoding: " + codec[wavInfo.codec])
+        print(f"\nEncoding: {codec[wavInfo.codec]}")
 
     else:
-        print("\nEncoding: " + str(wavInfo.codec))
+        print(f"\nEncoding: {str(wavInfo.codec)}")
 
-    print("Loop Flag: " + str(wavInfo.loop_flag))
-    print("Sample Rate: " + str(wavInfo.sample))
-    print("Loop Start Frame: " + str(wavInfo.loop_start))
-    print("Loop End Frame: " + str(wavInfo.loop_end))
+    print(f"Loop Flag: {str(wavInfo.loop_flag)}")
+    print(f"Sample Rate: {str(wavInfo.sample)}")
+    print(f"Loop Start Frame: {str(wavInfo.loop_start)}")
+    print(f"Loop End Frame: {str(wavInfo.loop_end)}")
 
     pos += wavInfo.size
 
     channelInfoTable = {}
     ADPCMInfo_ref = {}
 
-    count = struct.unpack(bom + "I", f[pos:pos + 4])[0]
-    print("Channel Count: " + str(count))
+    count = struct.unpack(f"{bom}I", f[pos:pos + 4])[0]
+    print(f"Channel Count: {str(count)}")
     countPos = pos
 
     for i in range(1, count + 1):
@@ -126,7 +126,7 @@ def readFile(f):
 
         if channelInfoTable[i].offset not in [0, -1]:
             pos = channelInfoTable[i].offset + countPos
-            print("\nChannel " + str(i) + " Info Entry offset: " + hex(pos))
+            print(f"\nChannel {str(i)} Info Entry offset: {hex(pos)}")
 
             sampleData_ref = Ref(bom)
             sampleData_ref.data(f, pos)
@@ -135,42 +135,42 @@ def readFile(f):
                 for z in range(1, header.numBlocks + 1):
                     if sized_refs[z].offset not in [0, -1]:
                         if sized_refs[z].type_ == 0x7001:
-                            print("\nChannel " + str(i) + " Info Entry Sample Data offset: " + hex(sampleData_ref.offset + sized_refs[z].offset + 8))
+                            print(f"\nChannel {str(i)} Info Entry Sample Data offset: {hex(sampleData_ref.offset + sized_refs[z].offset + 8)}")
 
             pos += 8
 
-            print("\nChannel " + str(i) + " Info Entry ADPCM Info Reference offset: " + hex(pos))
+            print(f"\nChannel {str(i)} Info Entry ADPCM Info Reference offset: {hex(pos)}")
 
             ADPCMInfo_ref[i] = Ref(bom)
             ADPCMInfo_ref[i].data(f, pos)
 
             if ADPCMInfo_ref[i].offset not in [0, -1]:
-                print("\nADPCM Info offset: " + hex(ADPCMInfo_ref[i].offset + pos - 8))
-                print("Type: " + hex(ADPCMInfo_ref[i].type_))
+                print(f"\nADPCM Info offset: {hex(ADPCMInfo_ref[i].offset + pos - 8)}")
+                print(f"Type: {hex(ADPCMInfo_ref[i].type_)}")
 
                 pos = ADPCMInfo_ref[i].offset + pos - 8
                 if ADPCMInfo_ref[i].type_ == 0x0300:
                     param = b''
                     for i in range(1, 17):
-                        param += struct.unpack(bom + "H", f[pos + 2 * (i - 1):pos + 2 * (i - 1) + 2])[0].to_bytes(2, 'big')
+                        param += struct.unpack(f"{bom}H", f[pos + 2 * (i - 1):pos + 2 * (i - 1) + 2])[0].to_bytes(2, 'big')
 
-                    print("Param: " + str(param))
+                    print(f"Param: {str(param)}")
 
                     pos += 32
                     context = DSPContext(bom)
                     context.data(f, pos)
 
-                    print("Context Predictor and Scale: " + hex(context.predictor_scale))
-                    print("Context Previous Sample: " + hex(context.preSample))
-                    print("Context Second Previous Sample: " + hex(context.preSample2))
+                    print(f"Context Predictor and Scale: {hex(context.predictor_scale)}")
+                    print(f"Context Previous Sample: {hex(context.preSample)}")
+                    print(f"Context Second Previous Sample: {hex(context.preSample2)}")
 
                     pos += context.size
                     loopContext = DSPContext(bom)
                     loopContext.data(f, pos)
 
-                    print("Loop Context Predictor and Scale: " + hex(loopContext.predictor_scale))
-                    print("Loop Context Previous Sample: " + hex(loopContext.preSample))
-                    print("Loop Context Second Previous Sample: " + hex(loopContext.preSample2))
+                    print(f"Loop Context Predictor and Scale: {hex(loopContext.predictor_scale)}")
+                    print(f"Loop Context Previous Sample: {hex(loopContext.preSample)}")
+                    print(f"Loop Context Second Previous Sample: {hex(loopContext.preSample2)}")
 
                     pos += loopContext.size
                     pos += 2
@@ -179,15 +179,15 @@ def readFile(f):
                     context = IMAContext(bom)
                     context.data(f, pos)
 
-                    print("Context Data: " + hex(context.data_))
-                    print("Context Table Index: " + hex(context.tableIndex))
+                    print(f"Context Data: {hex(context.data_)}")
+                    print(f"Context Table Index: {hex(context.tableIndex)}")
 
                     pos += context.size
                     loopContext = IMAContext(bom)
                     loopContext.data(f, pos)
 
-                    print("Loop Context Data: " + hex(loopContext.data_))
-                    print("Loop Context Table Index: " + hex(loopContext.tableIndex))
+                    print(f"Loop Context Data: {hex(loopContext.data_)}")
+                    print(f"Loop Context Table Index: {hex(loopContext.tableIndex)}")
 
                     pos += loopContext.size
 
@@ -198,8 +198,8 @@ def readFile(f):
                 data = BLKHeader(bom)
                 data.data(f, pos)
 
-                print("\nData Block Magic: " + bytes_to_string(data.magic))
-                print("Size: " + hex(data.size_))
+                print(f"\nData Block Magic: {bytes_to_string(data.magic)}")
+                print(f"Size: {hex(data.size_)}")
 
                 pos += data.size
                 data.data_ = f[pos:pos+data.size_ - 8]
